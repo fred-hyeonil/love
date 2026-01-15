@@ -80,7 +80,7 @@ export function SurveyScreen() {
             </button>
 
             {/* 중앙 설문 내용 */}
-            <div key={currentIndex} className="flex-1 survey-content-enter px-4 sm:px-10">
+            <div key={currentIndex} className="flex-1 animate-survey-slide-in px-4 sm:px-10">
               <h3 className="mb-12 text-4xl font-black tracking-tight text-rose-500 sm:text-6xl lg:text-7xl leading-[1.2] break-keep word-break-keep-all mx-auto max-w-4xl">
                 {currentQuestion.text}
               </h3>
@@ -94,7 +94,7 @@ export function SurveyScreen() {
                       type="button"
                       onClick={() => handleOptionSelect(optionIndex)}
                       style={{ animationDelay: `${optionIndex * 0.05}s` }}
-                      className={`group relative flex items-center justify-center rounded-[35px] border-4 px-10 py-10 transition-all hover:scale-105 active:scale-95 option-button-appear ${
+                      className={`group relative flex items-center justify-center rounded-[35px] border-4 px-10 py-10 transition-all hover:scale-105 active:scale-95 animate-option-fade-in ${
                         isSelected
                           ? "border-rose-400 bg-rose-500 text-white shadow-[0_20px_40px_rgba(244,114,182,0.3)]"
                           : "border-rose-100 bg-rose-50/30 text-rose-600 hover:border-rose-300 hover:bg-white"

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { BackgroundHearts } from "@/components/BackgroundHearts";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,8 +28,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="min-h-screen gradient-love-bg text-rose-950">
-          <main className="mx-auto w-full px-6 py-10 lg:px-12">
+        <div className="relative min-h-screen text-rose-950">
+          <BackgroundHearts />
+          <main className="relative z-10 mx-auto w-full px-6 py-10 lg:px-12">
             {children}
           </main>
         </div>

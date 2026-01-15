@@ -1,10 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { ActionButton } from "@/components/ActionButton";
 import { siteConfig } from "@/config/site";
 
 export function LoginScreen() {
-  const router = useRouter();
   const introEmojis = ["💖", "✨", "💗", "🌸", "💞", "🎀", "💘", "🌷", "🌹", "🎈", "🧸", "💌", "🍭", "🍀", "💎", "⭐"];
   
   const primaryAction = siteConfig.login.actions.find(
@@ -44,41 +43,32 @@ export function LoginScreen() {
                 <input
                   type={field.type}
                   placeholder={field.placeholder}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      const form = e.currentTarget.closest("section");
-                      const inputs = Array.from(form?.querySelectorAll("input") || []);
-                      const nextInput = inputs[index + 1] as HTMLInputElement;
-                      if (nextInput) {
-                        e.preventDefault();
-                        nextInput.focus();
-                      }
-                    }
-                  }}
                   className="w-full rounded-[30px] border-4 border-rose-100 bg-rose-50/30 px-10 py-6 text-2xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-8 focus:ring-rose-100/50"
                 />
               </div>
             ))}
           </div>
 
-          <div className="mt-16 flex flex-col gap-6">
+          <div className="mt-16 flex flex-col gap-8">
             {primaryAction && (
-              <button 
-                onClick={() => router.push("/ideal")}
-                className="w-full rounded-full bg-rose-500 py-8 text-3xl font-black text-white shadow-[0_20px_40px_rgba(244,114,182,0.4)] transition-all hover:scale-105 hover:bg-rose-600 active:scale-95"
-              >
-                {primaryAction.label}
-              </button>
+              <ActionButton 
+                label={primaryAction.label} 
+                href="/ideal" 
+                full 
+              />
             )}
             
-            <div className="flex items-center justify-center gap-10 mt-4">
-              <a href="/signup" className="text-xl font-bold text-rose-400 underline-offset-8 hover:text-rose-600 hover:underline">
-                {secondaryActions[0]?.label ?? "새로 가입"}
-              </a>
+            <div className="flex items-center justify-center gap-10">
+              <ActionButton 
+                label={secondaryActions[0]?.label ?? "새로 가입"} 
+                variant="ghost" 
+                href="/signup" 
+              />
               <span className="h-2 w-2 rounded-full bg-rose-200" />
-              <button className="text-xl font-bold text-rose-400 underline-offset-8 hover:text-rose-600 hover:underline">
-                {secondaryActions[1]?.label ?? "Google Login"}
-              </button>
+              <ActionButton 
+                label={secondaryActions[1]?.label ?? "Google Login"} 
+                variant="ghost" 
+              />
             </div>
           </div>
         </div>

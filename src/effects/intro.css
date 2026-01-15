@@ -3,12 +3,14 @@
 }
 
 .intro-phase-one {
-  opacity: 1;
-  animation: introFadeOut 1.2s ease 1.2s forwards;
+  opacity: 0;
+  animation: 
+    introFadeIn 0.8s ease 0.2s forwards,
+    introFadeOut 1.2s ease 2.2s forwards;
 }
 
 .intro-phase-two {
-  animation: introFadeIn 1.2s ease 1.6s forwards;
+  animation: introFadeIn 1.2s ease 3.2s forwards;
 }
 
 @keyframes introFadeOut {

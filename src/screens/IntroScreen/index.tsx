@@ -27,9 +27,18 @@ export function IntroScreen() {
       <div className="relative z-10 flex h-[82vh] w-[92%] items-center justify-center overflow-hidden rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-6 py-10 sm:w-[88%] lg:w-[82%]">
         <div className="relative flex min-h-[450px] w-full items-center justify-center text-center">
           {/* Phase One: 중앙 정렬, 액자 안을 벗어나지 않도록 크기 조절 */}
-          <p className="intro-phase intro-phase-one absolute whitespace-nowrap px-4 text-4xl font-extrabold tracking-tighter text-rose-500 sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl">
-            {siteConfig.intro.phaseOneText}
-          </p>
+          <div className="intro-phase intro-phase-one absolute flex flex-col items-center gap-8">
+            <p className="whitespace-nowrap px-4 text-4xl font-extrabold tracking-tighter text-rose-500 sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl">
+              {siteConfig.intro.phaseOneText}
+            </p>
+            <div className="relative h-48 w-72 overflow-hidden rounded-2xl shadow-2xl sm:h-64 sm:w-[450px] md:h-80 md:w-[600px]">
+              <img 
+                src="/images/lovenotcrime.png" 
+                alt="사랑에 빠진 게 죄는 아니잖아" 
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </div>
 
           {/* Phase Two: 동일한 중앙 위치 */}
           <div className="intro-phase intro-phase-two absolute flex w-full flex-col items-center gap-14 px-4">
@@ -39,7 +48,7 @@ export function IntroScreen() {
                 <span className="font-black">{siteConfig.intro.phaseTwoLine2}</span>
               </p>
             </div>
-            <div className="mt-6 scale-[2.8] transition-all hover:scale-[3.0] active:scale-[2.6]">
+            <div className="mt-6 transition-all">
               <ActionButton label={siteConfig.intro.cta} href="/login" />
             </div>
           </div>

@@ -1,10 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { ActionButton } from "@/components/ActionButton";
 import { siteConfig } from "@/config/site";
 
 export function SignupScreen() {
-  const router = useRouter();
   const introEmojis = ["💖", "✨", "💗", "🌸", "💞", "🎀", "💘", "🌷", "🌹", "🎈", "🧸", "💌", "🍭", "🍀", "💎", "⭐"];
 
   return (
@@ -38,27 +37,18 @@ export function SignupScreen() {
                 <input
                   type={field.type}
                   placeholder={field.placeholder}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      const form = e.currentTarget.closest("section");
-                      const inputs = Array.from(form?.querySelectorAll("input") || []);
-                      const nextInput = inputs[index + 1] as HTMLInputElement;
-                      if (nextInput) {
-                        e.preventDefault();
-                        nextInput.focus();
-                      }
-                    }
-                  }}
                   className="w-full rounded-[25px] border-4 border-rose-100 bg-rose-50/30 px-8 py-4 text-xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-8 focus:ring-rose-100/50"
                 />
               </div>
             ))}
           </div>
 
-          <div className="mt-12">
-            <button className="w-full rounded-full bg-rose-500 py-7 text-3xl font-black text-white shadow-[0_20px_40px_rgba(244,114,182,0.4)] transition-all hover:scale-105 hover:bg-rose-600 active:scale-95">
-              {siteConfig.signup.cta}
-            </button>
+          <div className="mt-12 w-full max-w-md mx-auto">
+            <ActionButton 
+              label={siteConfig.signup.cta} 
+              full 
+              href="/login" 
+            />
             
             <p className="mt-8 text-xl font-bold text-rose-300">
               이미 회원이신가요? <a href="/login" className="text-rose-500 underline underline-offset-4 hover:text-rose-700">로그인하기</a>
