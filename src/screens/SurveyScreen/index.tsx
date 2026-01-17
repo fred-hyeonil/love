@@ -93,7 +93,6 @@ export function SurveyScreen() {
                       key={`${currentQuestion.id}-option-${optionIndex}`}
                       type="button"
                       onClick={() => handleOptionSelect(optionIndex)}
-                      style={{ animationDelay: `${optionIndex * 0.05}s` }}
                       className={`group relative flex items-center justify-center rounded-[35px] border-4 px-10 py-10 transition-all hover:scale-105 active:scale-95 animate-option-fade-in ${
                         isSelected
                           ? "border-rose-400 bg-rose-500 text-white shadow-[0_20px_40px_rgba(244,114,182,0.3)]"

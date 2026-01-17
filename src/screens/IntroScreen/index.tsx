@@ -27,11 +27,13 @@ export function IntroScreen() {
       <div className="relative z-10 flex h-[82vh] w-[92%] items-center justify-center overflow-hidden rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-6 py-10 sm:w-[88%] lg:w-[82%]">
         <div className="relative flex min-h-[450px] w-full items-center justify-center text-center">
           {/* Phase One: 중앙 정렬, 액자 안을 벗어나지 않도록 크기 조절 */}
-          <div className="intro-phase intro-phase-one absolute flex flex-col items-center gap-8">
-            <p className="whitespace-nowrap px-4 text-4xl font-extrabold tracking-tighter text-rose-500 sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl">
-              {siteConfig.intro.phaseOneText}
-            </p>
-            <div className="relative h-48 w-72 overflow-hidden rounded-2xl shadow-2xl sm:h-64 sm:w-[450px] md:h-80 md:w-[600px]">
+          <div className="intro-phase intro-phase-one absolute flex w-full flex-col items-center justify-center gap-6 sm:gap-10 px-4">
+            <div className="w-full overflow-hidden">
+              <p className="whitespace-nowrap text-center text-[5.2vw] font-black tracking-tighter text-rose-500 sm:text-6xl md:text-7xl lg:text-8xl leading-none">
+                {siteConfig.intro.phaseOneText}
+              </p>
+            </div>
+            <div className="relative aspect-video w-[80%] max-w-[260px] sm:max-w-[500px] md:max-w-[600px] overflow-hidden rounded-2xl shadow-2xl transition-all">
               <img 
                 src="/images/lovenotcrime.png" 
                 alt="사랑에 빠진 게 죄는 아니잖아" 
@@ -41,14 +43,14 @@ export function IntroScreen() {
           </div>
 
           {/* Phase Two: 동일한 중앙 위치 */}
-          <div className="intro-phase intro-phase-two absolute flex w-full flex-col items-center gap-14 px-4">
-            <div className="space-y-8 whitespace-nowrap text-2xl font-extrabold text-rose-500 sm:text-4xl md:text-6xl lg:text-7xl">
+          <div className="intro-phase intro-phase-two absolute flex w-full flex-col items-center gap-12 sm:gap-16 px-4">
+            <div className="space-y-6 sm:space-y-10 text-[8.5vw] font-extrabold text-rose-500 sm:text-5xl md:text-7xl lg:text-8xl leading-tight break-keep">
               <p className="tracking-tight">{siteConfig.intro.phaseTwoLine1}</p>
               <p className="text-rose-600">
                 <span className="font-black">{siteConfig.intro.phaseTwoLine2}</span>
               </p>
             </div>
-            <div className="mt-6 transition-all">
+            <div className="mt-8 transition-all scale-110 sm:scale-125 hover:scale-135">
               <ActionButton label={siteConfig.intro.cta} href="/login" />
             </div>
           </div>

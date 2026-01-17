@@ -4,7 +4,7 @@
 @theme {
   --animate-float-heart: floatHeart 3s ease-in-out infinite;
   --animate-survey-slide-in: surveySlideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  --animate-option-fade-in: optionFadeIn 0.4s ease forwards;
+  --animate-option-fade-in: optionFadeIn 0.3s ease-out forwards;
 
   @keyframes floatHeart {
     0%, 100% {
