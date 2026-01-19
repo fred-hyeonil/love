@@ -181,31 +181,31 @@ export function ChatScreen() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <button 
-                    className="group relative flex flex-col items-center justify-center rounded-[40px] border-8 border-rose-400 bg-rose-500 p-12 transition-all hover:scale-[1.03] active:scale-95 shadow-2xl overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-white/10 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                    <span className="text-6xl mb-6 group-hover:animate-bounce relative z-10">👑</span>
-                    <span className="text-3xl font-black text-white relative z-10 tracking-tighter">진지하게 상담받기</span>
-                    <span className="text-base font-bold text-rose-100 mt-3 relative z-10">1:1 프리미엄 밀착 케어</span>
-                  </button>
-                  <button 
-                    className="group relative flex flex-col items-center justify-center rounded-[40px] border-8 border-rose-100 bg-white p-12 transition-all hover:scale-[1.03] active:scale-95 shadow-xl hover:border-rose-300 overflow-hidden"
+                    className="group relative flex flex-col items-center justify-center rounded-[40px] border-8 border-rose-100 bg-white p-8 transition-all hover:scale-[1.03] active:scale-95 shadow-xl hover:border-rose-300 overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-rose-50 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                    <span className="text-6xl mb-6 group-hover:rotate-12 transition-transform relative z-10">📱</span>
-                    <span className="text-3xl font-black text-rose-600 relative z-10 tracking-tighter">카톡 내용 평가받기</span>
-                    <span className="text-base font-bold text-rose-300 mt-3 relative z-10">실제 대화 캡처 분석</span>
+                    <span className="text-5xl mb-4 group-hover:animate-bounce relative z-10">👑</span>
+                    <span className="text-2xl font-black text-rose-600 relative z-10 tracking-tighter">진지하게 상담받기</span>
+                    <span className="text-sm font-bold text-rose-300 mt-2 relative z-10">1:1 프리미엄 케어</span>
                   </button>
-                </div>
-
-                <div className="text-center pt-12 pb-6">
+                  <button 
+                    className="group relative flex flex-col items-center justify-center rounded-[40px] border-8 border-rose-100 bg-white p-8 transition-all hover:scale-[1.03] active:scale-95 shadow-xl hover:border-rose-300 overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-rose-50 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                    <span className="text-5xl mb-4 group-hover:rotate-12 transition-transform relative z-10">📱</span>
+                    <span className="text-2xl font-black text-rose-600 relative z-10 tracking-tighter">카톡 내용 평가받기</span>
+                    <span className="text-sm font-bold text-rose-300 mt-2 relative z-10">대화 캡처 분석</span>
+                  </button>
                   <button 
                     onClick={() => setIsFeedbackMode(false)}
-                    className="text-rose-300 font-black text-xl hover:text-rose-500 transition-all hover:tracking-widest underline underline-offset-8"
+                    className="group relative flex flex-col items-center justify-center rounded-[40px] border-8 border-rose-100 bg-white p-8 transition-all hover:scale-[1.03] active:scale-95 shadow-xl hover:border-rose-300 overflow-hidden"
                   >
-                    BACK TO CHAT
+                    <div className="absolute inset-0 bg-rose-50 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                    <span className="text-5xl mb-4 group-hover:scale-110 transition-transform relative z-10">🔄</span>
+                    <span className="text-2xl font-black text-rose-600 relative z-10 tracking-tighter">채팅 다시 하기</span>
+                    <span className="text-sm font-bold text-rose-300 mt-2 relative z-10">캐릭터와 계속 대화</span>
                   </button>
                 </div>
               </div>

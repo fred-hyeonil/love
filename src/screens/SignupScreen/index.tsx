@@ -25,6 +25,25 @@ export function SignupScreen() {
   const [success, setSuccess] = useState<string | null>(null);
 
   const onChange = (id: string, next: string) => {
+    if (id === "birthdate") {
+      // 숫자만 추출
+      const digits = next.replace(/\D/g, "");
+      
+      // 최대 8자리 제한 (YYYYMMDD)
+      const limited = digits.slice(0, 8);
+      
+      // 포맷팅 (YYYY.MM.DD)
+      let formatted = limited;
+      if (limited.length > 4) {
+        formatted = limited.slice(0, 4) + "." + limited.slice(4);
+      }
+      if (limited.length > 6) {
+        formatted = formatted.slice(0, 7) + "." + formatted.slice(7);
+      }
+      
+      setValues((prev) => ({ ...prev, [id]: formatted }));
+      return;
+    }
     setValues((prev) => ({ ...prev, [id]: next }));
   };
 
@@ -77,34 +96,55 @@ const birthDateRaw = (values.birthdate ?? "").trim();
 };
 
   return (
-    <section className="fixed inset-0 flex items-center justify-center bg-rose-50">
-      <div className="bg-white p-10 rounded-3xl w-full max-w-xl">
-        <h2 className="text-3xl font-black text-rose-500 mb-8 text-center">
-          {siteConfig.signup.title}
-        </h2>
+    <section className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-rose-50 select-none">
+      {/* 배경 이모티콘 */}
+      <div className="absolute inset-0 -z-10 flex flex-wrap items-center justify-center gap-8 p-10 opacity-30 pointer-events-none">
+        {Array.from({ length: 180 }).map((_, i) => (
+          <span key={i} className="text-3xl sm:text-4xl">
+            {introEmojis[i % introEmojis.length]}
+          </span>
+        ))}
+      </div>
 
-        <div className="space-y-4">
-          {siteConfig.signup.fields.map((field) => (
-            <input
-              key={field.id}
-              type={field.id === "birthdate" ? "date" : field.type}
-              placeholder={field.placeholder}
-              value={values[field.id] ?? ""}
-              onChange={(e) => onChange(field.id, e.target.value)}
-              className="w-full border-2 rounded-xl p-3"
-            />
-          ))}
+      {/* 중앙 대형 핑크 액자 */}
+      <div className="relative z-10 flex h-[92vh] w-[94%] flex-col items-center justify-center rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-10 py-10 sm:w-[85%] lg:w-[75%]">
+        <div className="w-full max-w-4xl text-center">
+          <h2 className="mb-8 text-5xl font-black tracking-tighter text-rose-500 sm:text-6xl">
+            {siteConfig.signup.title}
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-left">
+            {siteConfig.signup.fields.map((field) => (
+              <div key={field.id} className="relative group">
+                <p className="ml-6 mb-1 text-lg font-bold text-rose-400">{field.label}</p>
+                <input
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  value={values[field.id] ?? ""}
+                  onChange={(e) => onChange(field.id, e.target.value)}
+                  className="w-full rounded-[25px] border-4 border-rose-100 bg-rose-50/30 px-8 py-4 text-xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-8 focus:ring-rose-100/50"
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 w-full max-w-md mx-auto">
+            <button
+              onClick={onSignup}
+              disabled={submitting}
+              className="w-full rounded-full bg-rose-500 py-6 text-3xl font-black text-white shadow-[0_20px_40px_rgba(244,114,182,0.4)] transition-all hover:scale-105 hover:bg-rose-600 active:scale-95 disabled:opacity-60"
+            >
+              {submitting ? "처리 중..." : siteConfig.signup.cta}
+            </button>
+            
+            {error && <p className="mt-4 text-lg font-bold text-red-500">{error}</p>}
+            {success && <p className="mt-4 text-lg font-bold text-green-500">{success}</p>}
+
+            <p className="mt-6 text-xl font-bold text-rose-300">
+              이미 회원이신가요? <a href="/login" className="text-rose-500 underline underline-offset-4 hover:text-rose-700">로그인하기</a>
+            </p>
+          </div>
         </div>
-
-        <button
-          onClick={onSignup}
-          disabled={submitting}
-          className="mt-6 w-full bg-rose-500 text-white py-3 rounded-xl font-bold"
-        >
-          {submitting ? "처리중..." : siteConfig.signup.cta}
-        </button>
-
-        {error && <p className="mt-4 text-red-500 font-bold">{error}</p>}
       </div>
     </section>
   );
