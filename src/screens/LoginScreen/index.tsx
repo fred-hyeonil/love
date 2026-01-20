@@ -49,10 +49,20 @@ export function LoginScreen() {
         body: JSON.stringify({ userId, password }),
       });
 
-      // JWT 저장
+      // JWT 및 사용자 정보 저장
       localStorage.setItem("accessToken", data.accessToken);
+      if (data.user?.name) {
+        localStorage.setItem("userName", data.user.name);
+      } else if (data.name) {
+        localStorage.setItem("userName", data.name);
+      }
 
-      router.push("/ideal"); // 로그인 성공 후 이동
+      const savedResult = localStorage.getItem("surveyResult");
+      if (savedResult) {
+        router.push("/chat");
+      } else {
+        router.push("/ideal"); // 로그인 성공 후 이동
+      }
     } catch (e: any) {  
   if (e?.name === "ApiError" && e.status === 401) {
     setError("아이디/비밀번호를 다시 확인해주세요.");

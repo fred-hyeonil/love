@@ -32,14 +32,34 @@ export function SignupScreen() {
       // 최대 8자리 제한 (YYYYMMDD)
       const limited = digits.slice(0, 8);
       
+      let year = limited.slice(0, 4);
+      let month = limited.slice(4, 6);
+      let day = limited.slice(6, 8);
+
+      // 월 제한 (01~12)
+      if (month.length === 2) {
+        const m = parseInt(month);
+        if (m > 12) month = "12";
+        if (m === 0) month = "01";
+      } else if (month.length === 1) {
+        // 첫 글자가 2~9이면 자동으로 앞에 0을 붙임 (예: 2 -> 02)
+        if (parseInt(month) > 1) month = "0" + month;
+      }
+
+      // 일 제한 (01~31)
+      if (day.length === 2) {
+        const d = parseInt(day);
+        if (d > 31) day = "31";
+        if (d === 0) day = "01";
+      } else if (day.length === 1) {
+        // 첫 글자가 4~9이면 자동으로 앞에 0을 붙임 (예: 4 -> 04)
+        if (parseInt(day) > 3) day = "0" + day;
+      }
+      
       // 포맷팅 (YYYY.MM.DD)
-      let formatted = limited;
-      if (limited.length > 4) {
-        formatted = limited.slice(0, 4) + "." + limited.slice(4);
-      }
-      if (limited.length > 6) {
-        formatted = formatted.slice(0, 7) + "." + formatted.slice(7);
-      }
+      let formatted = year;
+      if (month) formatted += "." + month;
+      if (day) formatted += "." + day;
       
       setValues((prev) => ({ ...prev, [id]: formatted }));
       return;
@@ -80,6 +100,7 @@ const birthDateRaw = (values.birthdate ?? "").trim();
       body: JSON.stringify({ userId, password, name, birthDate }),
     });
 
+    localStorage.setItem("userName", name);
     setSuccess("회원가입 성공! 로그인 페이지로 이동합니다.");
     router.push("/login");
   } catch (e: any) {

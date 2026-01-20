@@ -1,16 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 
 export function ChatScreen() {
   const router = useRouter();
   const [isFeedbackMode, setIsFeedbackMode] = useState(false);
+  const [userArchetype, setUserArchetype] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>("사용자");
+  const [displayText, setDisplayText] = useState("현재 대화 중...");
+  const [messages, setMessages] = useState(siteConfig.chat.messages);
+  const [inputValue, setInputValue] = useState("");
+  
   const introEmojis = ["💖", "✨", "💗", "🌸", "💞", "🎀", "💘", "🌷", "🌹", "🎈", "🧸", "💌", "🍭", "🍀", "💎", "⭐"];
+
+  useEffect(() => {
+    const savedResult = localStorage.getItem("surveyResult");
+    const savedName = localStorage.getItem("userName");
+    setUserArchetype(savedResult);
+    if (savedName) setUserName(savedName);
+  }, []);
+
+  useEffect(() => {
+    if (!userArchetype) return;
+
+    const interval = setInterval(() => {
+      setDisplayText((prev) => 
+        prev === "현재 대화 중..." 
+          ? `${userArchetype} ${userName} 님` 
+          : "현재 대화 중..."
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [userArchetype, userName]);
 
   const handleEndChat = () => {
     setIsFeedbackMode(true);
+  };
+
+  const handleSendMessage = () => {
+    if (!inputValue.trim()) return;
+
+    const newMessage = {
+      id: `m${messages.length + 1}`,
+      speaker: "나" as const,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+      text: inputValue,
+    };
+
+    setMessages((prev) => [...prev, newMessage]);
+    setInputValue("");
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+      handleSendMessage();
+    }
   };
 
   return (
@@ -54,6 +101,16 @@ export function ChatScreen() {
                 <span className="text-lg font-bold tracking-tight">{item}</span>
               </button>
             ))}
+            
+            <button 
+              onClick={() => {
+                localStorage.removeItem("surveyResult");
+                router.push("/survey");
+              }}
+              className="w-full group flex items-center gap-4 rounded-[20px] border-2 p-4 transition-all shadow-sm bg-white/60 border-transparent text-rose-600/80 hover:border-rose-300 hover:bg-white"
+            >
+              <span className="text-lg font-bold tracking-tight">성격 테스트 다시 하기</span>
+            </button>
           </nav>
 
           <button 
@@ -82,10 +139,33 @@ export function ChatScreen() {
                     <p className="text-xs font-black text-rose-400 uppercase tracking-widest mt-1">Dating Solution Active</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-full bg-rose-50 px-8 py-4 border-2 border-rose-100 shadow-sm">
-                  <div className="h-3 w-3 rounded-full bg-rose-400 animate-pulse" />
-                  <span className="text-rose-500 text-sm font-black uppercase">현재 대화 중...</span>
+                <div className="flex items-center gap-3 rounded-full bg-rose-50 px-8 py-4 border-2 border-rose-100 shadow-sm min-w-[240px] justify-center overflow-hidden">
+                  <div className="h-3 w-3 rounded-full bg-rose-400 animate-pulse flex-shrink-0" />
+                  <div className="relative h-5 flex-1 flex justify-center items-center">
+                    <span 
+                      key={displayText}
+                      className="absolute text-rose-500 text-sm font-black uppercase whitespace-nowrap animate-text-slide-up"
+                    >
+                      {displayText}
+                    </span>
+                  </div>
                 </div>
+
+                <style jsx global>{`
+                  @keyframes text-slide-up {
+                    0% {
+                      opacity: 0;
+                      transform: translateY(100%);
+                    }
+                    100% {
+                      opacity: 1;
+                      transform: translateY(0);
+                    }
+                  }
+                  .animate-text-slide-up {
+                    animation: text-slide-up 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+                  }
+                `}</style>
               </header>
 
               {/* 채팅 메시지 리스트 */}
@@ -95,7 +175,7 @@ export function ChatScreen() {
                     선택한 캐릭터와 설문 결과를 바탕으로 대화합니다
                   </span>
                 </div>
-                {siteConfig.chat.messages.map((message) => {
+                {messages.map((message) => {
                   const isMe = message.speaker === "나";
                   return (
                     <div key={message.id} className={`flex items-start gap-5 ${isMe ? "flex-row-reverse" : "flex-row"}`}>
@@ -105,7 +185,7 @@ export function ChatScreen() {
                       <div className={`relative flex flex-col gap-2 max-w-[75%] ${isMe ? "items-end" : "items-start"}`}>
                         <div className="flex items-center gap-2 mb-1 px-2">
                           <span className="text-sm font-black text-rose-400 uppercase tracking-tighter">
-                            {isMe ? "영광" : "동그라미"}
+                            {isMe ? (userName === "사용자" ? "나" : userName) : siteConfig.chat.character.name}
                           </span>
                         </div>
                         <div className={`relative px-8 py-5 rounded-[30px] shadow-sm transition-all border-2 ${
@@ -113,7 +193,9 @@ export function ChatScreen() {
                             ? "bg-rose-500 text-white border-rose-400 rounded-tr-none" 
                             : "bg-white text-rose-700 border-rose-100 rounded-tl-none"
                         }`}>
-                          <p className="text-xl font-bold leading-relaxed break-keep">{message.text}</p>
+                          <p className="text-xl font-bold leading-relaxed break-keep">
+                            {message.text}
+                          </p>
                           <div className={`absolute top-0 w-4 h-4 ${isMe ? "-right-1.5 bg-rose-500" : "-left-1.5 bg-white border-l-2 border-t-2 border-rose-100"} transform rotate-45 -z-10`} />
                         </div>
                         <span className="text-[11px] font-black text-rose-200 px-2 uppercase tracking-tighter">{message.time} · Read</span>
@@ -129,6 +211,9 @@ export function ChatScreen() {
                   {siteConfig.chat.quickReplies.map((reply) => (
                     <button 
                       key={reply}
+                      onClick={() => {
+                        setInputValue(reply);
+                      }}
                       className="rounded-full border-2 border-rose-200 bg-white px-6 py-2.5 text-base font-black text-rose-400 transition-all hover:border-rose-400 hover:text-rose-600 hover:scale-105 active:scale-95 shadow-sm"
                     >
                       {reply}
@@ -140,9 +225,15 @@ export function ChatScreen() {
                     <input 
                       type="text" 
                       placeholder="고민을 입력하세요..."
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={handleKeyPress}
                       className="flex-1 bg-transparent py-5 text-xl font-bold text-rose-600 placeholder:text-rose-200 focus:outline-none"
                     />
-                    <button className="rounded-full bg-rose-500 px-10 py-5 text-lg font-black text-white shadow-lg hover:bg-rose-600 transition-all active:scale-95 border-2 border-rose-400">
+                    <button 
+                      onClick={handleSendMessage}
+                      className="rounded-full bg-rose-500 px-10 py-5 text-lg font-black text-white shadow-lg hover:bg-rose-600 transition-all active:scale-95 border-2 border-rose-400"
+                    >
                       SEND ✨
                     </button>
                   </div>
