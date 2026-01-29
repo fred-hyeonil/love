@@ -25,28 +25,28 @@ export function IdealScreen() {
       </div>
 
       {/* 중앙 대형 핑크 액자 */}
-      <div className="relative z-10 flex h-[90vh] w-[94%] flex-col items-center justify-center rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-6 py-10 sm:w-[90%] lg:w-[85%]">
-        <div className="w-full max-w-6xl text-center">
-          <h2 className="mb-12 text-5xl font-black tracking-tighter text-rose-500 sm:text-7xl">
+      <div className="relative z-10 flex h-[90vh] w-[94%] flex-col items-center justify-center rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-4 py-8 sm:px-6 sm:py-10 sm:w-[90%] lg:w-[85%]">
+        <div className="w-full max-w-6xl text-center overflow-y-auto scrollbar-hide">
+          <h2 className="mb-8 sm:mb-12 text-3xl sm:text-5xl lg:text-7xl font-black tracking-tighter text-rose-500 leading-tight">
             {siteConfig.ideal.title}
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
             {siteConfig.ideal.choices.map((choice) => (
               <button
                 key={choice.id}
                 onClick={() => router.push("/survey")}
-                className="group relative flex flex-col items-center justify-center rounded-[40px] border-4 border-rose-100 bg-rose-50/30 px-4 py-8 transition-all hover:scale-110 hover:border-rose-400 hover:bg-white hover:shadow-[0_20px_40px_rgba(244,114,182,0.2)] active:scale-95"
+                className="group relative flex flex-col items-center justify-center rounded-[30px] sm:rounded-[40px] border-[3px] sm:border-4 border-rose-100 bg-rose-50/30 px-4 py-6 sm:py-8 transition-all hover:scale-[1.05] hover:border-rose-400 hover:bg-white hover:shadow-[0_20px_40px_rgba(244,114,182,0.2)] active:scale-95"
               >
-                <span className="mb-4 text-6xl transition-transform group-hover:scale-125 sm:text-7xl">
+                <span className="mb-2 sm:mb-4 text-5xl sm:text-6xl lg:text-7xl transition-transform group-hover:scale-110">
                   {choice.emoji}
                 </span>
-                <p className="text-2xl font-black text-rose-600 sm:text-3xl">
+                <p className="text-xl sm:text-2xl lg:text-3xl font-black text-rose-600 truncate w-full">
                   {choice.label}
                 </p>
-                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <div className="mt-2 sm:mt-4 flex flex-wrap justify-center gap-1.5 sm:gap-2">
                   {choice.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-rose-100 px-3 py-1 text-sm font-bold text-rose-400">
+                    <span key={tag} className="rounded-full bg-rose-100 px-2.5 py-0.5 sm:px-3 sm:py-1 text-[10px] sm:text-sm font-bold text-rose-400 whitespace-nowrap">
                       {tag}
                     </span>
                   ))}
@@ -55,7 +55,7 @@ export function IdealScreen() {
             ))}
           </div>
 
-          <p className="mt-16 text-2xl font-bold text-rose-300 animate-bounce">
+          <p className="mt-8 sm:mt-16 text-lg sm:text-2xl font-bold text-rose-300 animate-bounce">
             가장 마음에 드는 타입을 선택해 보세요! ✨
           </p>
         </div>

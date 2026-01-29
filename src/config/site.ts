@@ -1,3 +1,4 @@
+// v2 - updated site config
 export const siteConfig = {
   brand: {
     name: "Can I love ?",
@@ -163,32 +164,7 @@ export const siteConfig = {
       emoji: "⭕",
       description: "당신의 연애 파트너",
     },
-    messages: [
-      {
-        id: "m1",
-        speaker: "상대",
-        time: "22:00",
-        text: "영광아 너 이제부터 10시 통금이야",
-      },
-      {
-        id: "m2",
-        speaker: "나",
-        time: "22:01",
-        text: "또 왜그러는데 자기야 ..",
-      },
-      {
-        id: "m3",
-        speaker: "상대",
-        time: "22:02",
-        text: "너 지금 또라 했어? 너 잘못이 뭔지 몰라 ?",
-      },
-      {
-        id: "m4",
-        speaker: "나",
-        time: "22:03",
-        text: "미안해 ..",
-      },
-    ],
+    messages: [], // 초기 대화는 ChatScreen에서 랜덤으로 생성함
     quickReplies: ["문장 추천해줘", "다른 해결책 알려줘", "감정 정리 도와줘"],
   },
   decorations: {

@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { apiFetch } from "@/lib/api";
 
+// v2 - updated chat logic
 export function ChatScreen() {
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isFeedbackMode, setIsFeedbackMode] = useState(false);
   const [userArchetype, setUserArchetype] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("사용자");
-  const [messages, setMessages] = useState(siteConfig.chat.messages);
+  const [messages, setMessages] = useState<{id: string, speaker: "나" | "상대방", time: string, text: string}[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
@@ -22,6 +23,21 @@ export function ChatScreen() {
     const savedName = localStorage.getItem("userName");
     setUserArchetype(savedResult);
     if (savedName) setUserName(savedName);
+
+    // 랜덤 첫 대화 설정
+    const initialPrompts = [
+      "오빠 오늘 뭐 했어?",
+      "자기야 왜 이렇게 연락이 안 돼 ?",
+      "오빠 나 지금 오빠한테 엄청 서운해"
+    ];
+    const randomPrompt = initialPrompts[Math.floor(Math.random() * initialPrompts.length)];
+    
+    setMessages([{
+      id: "m1",
+      speaker: "상대방" as const,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+      text: randomPrompt
+    }]);
   }, []);
 
   useEffect(() => {

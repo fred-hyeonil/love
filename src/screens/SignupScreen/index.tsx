@@ -128,40 +128,40 @@ const birthDateRaw = (values.birthdate ?? "").trim();
       </div>
 
       {/* 중앙 대형 핑크 액자 */}
-      <div className="relative z-10 flex h-[92vh] w-[94%] flex-col items-center justify-center rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-10 py-10 sm:w-[85%] lg:w-[75%]">
-        <div className="w-full max-w-4xl text-center">
-          <h2 className="mb-8 text-5xl font-black tracking-tighter text-rose-500 sm:text-6xl">
+      <div className="relative z-10 flex h-[92vh] w-[94%] flex-col items-center justify-center rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-4 py-8 sm:px-10 sm:py-10 sm:w-[85%] lg:w-[75%]">
+        <div className="w-full max-w-4xl text-center overflow-y-auto scrollbar-hide">
+          <h2 className="mb-4 sm:mb-8 text-4xl sm:text-6xl font-black tracking-tighter text-rose-500">
             {siteConfig.signup.title}
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-3 sm:gap-y-4 text-left">
             {siteConfig.signup.fields.map((field) => (
               <div key={field.id} className="relative group">
-                <p className="ml-6 mb-1 text-lg font-bold text-rose-400">{field.label}</p>
+                <p className="ml-4 sm:ml-6 mb-1 text-base sm:text-lg font-bold text-rose-400">{field.label}</p>
                 <input
                   type={field.type}
                   placeholder={field.placeholder}
                   value={values[field.id] ?? ""}
                   onChange={(e) => onChange(field.id, e.target.value)}
-                  className="w-full rounded-[25px] border-4 border-rose-100 bg-rose-50/30 px-8 py-4 text-xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-8 focus:ring-rose-100/50"
+                  className="w-full rounded-[20px] sm:rounded-[25px] border-[3px] sm:border-4 border-rose-100 bg-rose-50/30 px-6 py-3 sm:px-8 sm:py-4 text-lg sm:text-xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-4 sm:ring-8 focus:ring-rose-100/50"
                 />
               </div>
             ))}
           </div>
 
-          <div className="mt-10 w-full max-w-md mx-auto">
+          <div className="mt-6 sm:mt-10 w-full max-w-md mx-auto">
             <button
               onClick={onSignup}
               disabled={submitting}
-              className="w-full rounded-full bg-rose-500 py-6 text-3xl font-black text-white shadow-[0_20px_40px_rgba(244,114,182,0.4)] transition-all hover:scale-105 hover:bg-rose-600 active:scale-95 disabled:opacity-60"
+              className="w-full rounded-full bg-rose-500 py-4 sm:py-6 text-2xl sm:text-3xl font-black text-white shadow-[0_15px_30px_rgba(244,114,182,0.4)] transition-all hover:scale-105 hover:bg-rose-600 active:scale-95 disabled:opacity-60"
             >
               {submitting ? "처리 중..." : siteConfig.signup.cta}
             </button>
             
-            {error && <p className="mt-4 text-lg font-bold text-red-500">{error}</p>}
-            {success && <p className="mt-4 text-lg font-bold text-green-500">{success}</p>}
+            {error && <p className="mt-4 text-base sm:text-lg font-bold text-red-500">{error}</p>}
+            {success && <p className="mt-4 text-base sm:text-lg font-bold text-green-500">{success}</p>}
 
-            <p className="mt-6 text-xl font-bold text-rose-300">
+            <p className="mt-4 sm:mt-6 text-lg sm:text-xl font-bold text-rose-300">
               이미 회원이신가요? <a href="/login" className="text-rose-500 underline underline-offset-4 hover:text-rose-700">로그인하기</a>
             </p>
           </div>

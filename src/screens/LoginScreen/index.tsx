@@ -94,13 +94,13 @@ export function LoginScreen() {
       </div>
 
       {/* 중앙 카드 */}
-      <div className="relative z-10 flex h-[85vh] w-[94%] flex-col items-center justify-center rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-10 py-12 sm:w-[85%] lg:w-[70%]">
-        <div className="w-full max-w-2xl text-center">
-          <h2 className="mb-12 text-6xl font-black tracking-tighter text-rose-500 sm:text-7xl">
+      <div className="relative z-10 flex h-[90vh] sm:h-[85vh] w-[94%] flex-col items-center justify-center rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-6 py-10 sm:px-10 sm:py-12 sm:w-[85%] lg:w-[70%] xl:w-[60%]">
+        <div className="w-full max-w-2xl text-center overflow-y-auto scrollbar-hide">
+          <h2 className="mb-6 sm:mb-12 text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-rose-500">
             {siteConfig.login.title}
           </h2>
 
-          <div className="space-y-8">
+          <div className="space-y-4 sm:space-y-8">
             {siteConfig.login.fields.map((field) => (
               <input
                 key={field.id}
@@ -108,27 +108,27 @@ export function LoginScreen() {
                 placeholder={field.placeholder}
                 value={values[field.id] ?? ""}
                 onChange={(e) => onChange(field.id, e.target.value)}
-                className="w-full rounded-[30px] border-4 border-rose-100 bg-rose-50/30 px-10 py-6 text-2xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-8 focus:ring-rose-100/50"
+                className="w-full rounded-[20px] sm:rounded-[30px] border-[3px] sm:border-4 border-rose-100 bg-rose-50/30 px-6 py-4 sm:px-10 sm:py-6 text-lg sm:text-2xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-4 sm:ring-8 focus:ring-rose-100/50"
               />
             ))}
           </div>
 
           {error && (
-            <p className="mt-6 text-lg font-bold text-red-500">{error}</p>
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg font-bold text-red-500">{error}</p>
           )}
 
-          <div className="mt-16 flex flex-col gap-8">
+          <div className="mt-8 sm:mt-16 flex flex-col gap-4 sm:gap-8">
             {primaryAction && (
               <button
                 onClick={onLogin}
                 disabled={submitting}
-                className="w-full rounded-[30px] bg-rose-500 px-10 py-6 text-2xl font-black text-white shadow-lg transition-all hover:bg-rose-600 disabled:opacity-60"
+                className="w-full rounded-[20px] sm:rounded-[30px] bg-rose-500 px-6 py-4 sm:px-10 sm:py-6 text-xl sm:text-2xl font-black text-white shadow-lg transition-all hover:bg-rose-600 active:scale-95 disabled:opacity-60"
               >
                 {submitting ? "로그인 중..." : primaryAction.label}
               </button>
             )}
 
-            <div className="flex items-center justify-center gap-10">
+            <div className="flex items-center justify-center gap-4 sm:gap-10">
               <ActionButton
                 label={secondaryActions[0]?.label ?? "새로 가입"}
                 variant="ghost"

@@ -30,9 +30,9 @@ export function ActionButton({
   };
 
   const sizes = {
-    primary: "px-12 py-6 text-3xl",
-    secondary: "px-8 py-4 text-xl",
-    ghost: "px-4 py-2 text-xl",
+    primary: "px-8 py-4 sm:px-12 sm:py-6 text-xl sm:text-3xl",
+    secondary: "px-6 py-3 sm:px-8 sm:py-4 text-lg sm:text-xl",
+    ghost: "px-3 py-1.5 sm:px-4 sm:py-2 text-base sm:text-xl",
   };
 
   const combinedClassName = `${base} ${variants[variant]} ${sizes[variant]} ${full ? "w-full" : ""} ${className}`;

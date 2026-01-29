@@ -1,4 +1,4 @@
-const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://172.30.1.93:8080";
+const BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
 
 // Dev debug: shows which base URL is being used in the browser console
 if (typeof window !== "undefined") {
