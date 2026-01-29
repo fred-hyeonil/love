@@ -111,34 +111,34 @@ export function SurveyScreen() {
       </div>
 
       {/* 중앙 대형 핑크 액자 */}
-      <div className="relative z-10 flex h-[90vh] w-[94%] flex-col items-center justify-center rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-6 py-10 sm:w-[90%] lg:w-[85%]">
-        <div className="w-full max-w-5xl text-center">
-          <div className="mb-8 flex items-center justify-center gap-4 text-2xl font-bold text-rose-300">
+      <div className="relative z-10 flex h-[92vh] w-[96%] flex-col items-center justify-center rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-4 py-8 sm:px-6 sm:py-10 sm:w-[90%] lg:w-[85%]">
+        <div className="w-full max-w-5xl text-center h-full flex flex-col justify-center">
+          <div className="mb-4 sm:mb-8 flex items-center justify-center gap-3 sm:gap-4 text-lg sm:text-2xl font-bold text-rose-300">
             <span>Question</span>
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-rose-100 text-rose-500">
+            <span className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-rose-100 text-rose-500">
               {currentIndex + 1}
             </span>
             <span className="text-rose-200">/</span>
             <span>{totalQuestions}</span>
           </div>
 
-          <div className="w-full flex items-center justify-between gap-10">
+          <div className="w-full flex items-center justify-between gap-4 sm:gap-10">
             {/* 왼쪽 화살표 버튼 < */}
             <button
               onClick={handlePrev}
               disabled={currentIndex === 0}
-              className="flex h-24 w-24 flex-shrink-0 items-center justify-center rounded-full border-4 border-rose-100 bg-white text-5xl font-black text-rose-300 transition-all hover:border-rose-400 hover:text-rose-500 disabled:opacity-0 active:scale-90"
+              className="flex h-16 w-16 sm:h-24 sm:w-24 flex-shrink-0 items-center justify-center rounded-full border-4 border-rose-100 bg-white text-3xl sm:text-5xl font-black text-rose-300 transition-all hover:border-rose-400 hover:text-rose-500 disabled:opacity-0 active:scale-90"
             >
               ‹
             </button>
 
             {/* 중앙 설문 내용 */}
-            <div key={currentIndex} className="flex-1 animate-survey-slide-in px-4 sm:px-10">
-              <h3 className="mb-12 text-4xl font-black tracking-tight text-rose-500 sm:text-6xl lg:text-7xl leading-[1.2] break-keep word-break-keep-all mx-auto max-w-4xl">
+            <div key={currentIndex} className="flex-1 animate-survey-slide-in px-2 sm:px-10 overflow-y-auto max-h-[70vh] scrollbar-hide">
+              <h3 className="mb-6 sm:mb-12 text-2xl font-black tracking-tight text-rose-500 sm:text-5xl lg:text-6xl leading-[1.2] break-keep word-break-keep-all mx-auto max-w-4xl">
                 {currentQuestion.text}
               </h3>
               
-              <div className="grid grid-cols-1 gap-4 max-w-4xl mx-auto">
+              <div className="grid grid-cols-1 gap-3 sm:gap-4 max-w-4xl mx-auto">
                 {currentQuestion.options.map((option, optionIndex) => {
                   const isSelected = selectedOption === optionIndex;
                   return (
@@ -146,13 +146,13 @@ export function SurveyScreen() {
                       key={`${currentQuestion.id}-option-${optionIndex}`}
                       type="button"
                       onClick={() => handleOptionSelect(optionIndex)}
-                      className={`group relative flex items-center justify-center rounded-[30px] border-4 px-8 py-6 transition-all hover:scale-[1.02] active:scale-95 animate-option-fade-in ${
+                      className={`group relative flex items-center justify-center rounded-[20px] sm:rounded-[30px] border-4 px-6 py-4 sm:px-8 sm:py-6 transition-all hover:scale-[1.01] active:scale-95 animate-option-fade-in ${
                         isSelected
                           ? "border-rose-400 bg-rose-500 text-white shadow-[0_15px_30px_rgba(244,114,182,0.3)]"
                           : "border-rose-100 bg-rose-50/30 text-rose-600 hover:border-rose-300 hover:bg-white"
                       }`}
                     >
-                      <span className={`text-xl font-black sm:text-2xl leading-tight break-keep ${isSelected ? "text-white" : "text-rose-600"}`}>
+                      <span className={`text-base font-black sm:text-xl lg:text-2xl leading-tight break-keep ${isSelected ? "text-white" : "text-rose-600"}`}>
                         {option}
                       </span>
                     </button>
@@ -162,13 +162,13 @@ export function SurveyScreen() {
             </div>
 
             {/* 오른쪽 공간 (마지막 문제에서만 DONE 표시) */}
-            <div className="w-24 flex-shrink-0 flex items-center justify-center">
+            <div className="w-16 sm:w-24 flex-shrink-0 flex items-center justify-center">
               {isLast && canProceed && (
                 <button
                   onClick={handleNext}
-                  className="w-48 px-6 py-8 bg-rose-500 border-4 border-rose-400 text-white rounded-full shadow-xl hover:scale-110 transition-all active:scale-90"
+                  className="w-32 sm:w-48 px-4 py-6 sm:px-6 sm:py-8 bg-rose-500 border-4 border-rose-400 text-white rounded-full shadow-xl hover:scale-110 transition-all active:scale-90"
                 >
-                  <span className="text-3xl font-black">DONE ✨</span>
+                  <span className="text-xl sm:text-3xl font-black">DONE ✨</span>
                 </button>
               )}
             </div>
