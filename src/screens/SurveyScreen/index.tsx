@@ -11,6 +11,7 @@ export function SurveyScreen() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [showResultPopup, setShowResultPopup] = useState(false);
   const [finalResult, setFinalResult] = useState("");
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const savedResult = localStorage.getItem("surveyResult");
@@ -27,16 +28,20 @@ export function SurveyScreen() {
   const introEmojis = ["💖", "✨", "💗", "🌸", "💞", "🎀", "💘", "🌷", "🌹", "🎈", "🧸", "💌", "🍭", "🍀", "💎", "⭐"];
 
   const handleOptionSelect = (optionIndex: number) => {
+    if (isTransitioning) return;
+
     setAnswers((prev) => ({
       ...prev,
       [currentQuestion.id]: optionIndex,
     }));
-    
+
     // 마지막 문제가 아니면 선택 후 자동으로 다음 문제로 이동
     if (!isLast) {
+      setIsTransitioning(true);
       setTimeout(() => {
         setCurrentIndex((prev) => prev + 1);
-      }, 300); // 0.3초 딜레이로 선택된 피드백을 보여줌
+        setIsTransitioning(false);
+      }, 400); // 0.4초 딜레이로 선택된 피드백을 보여줌
     }
   };
 
@@ -45,8 +50,15 @@ export function SurveyScreen() {
   };
 
   const handleNext = () => {
-    if (isLast && canProceed) {
-      // 점수 계산 로직: 0 / 2 / 4 / 6 배점
+    if (!canProceed) return;
+
+    if (!isLast) {
+      setCurrentIndex((prev) => prev + 1);
+      return;
+    }
+
+    // 마지막 문제일 경우 결과 계산
+    // 점수 계산 로직: 0 / 2 / 4 / 6 배점
       const optionScores = [
         [0, 2, 4, 6], // Q1: 경험 횟수 (0이면 모솔남 확정)
         [6, 4, 2, 0], // Q2: 데이트 준비
@@ -79,7 +91,6 @@ export function SurveyScreen() {
       localStorage.setItem("surveyResult", result);
       setFinalResult(result);
       setShowResultPopup(true);
-    }
   };
 
   return (

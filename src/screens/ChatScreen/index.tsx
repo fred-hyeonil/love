@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 
 export function ChatScreen() {
   const router = useRouter();
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [isFeedbackMode, setIsFeedbackMode] = useState(false);
   const [userArchetype, setUserArchetype] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("사용자");
-  const [displayText, setDisplayText] = useState("현재 대화 중...");
   const [messages, setMessages] = useState(siteConfig.chat.messages);
   const [inputValue, setInputValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   
   const introEmojis = ["💖", "✨", "💗", "🌸", "💞", "🎀", "💘", "🌷", "🌹", "🎈", "🧸", "💌", "🍭", "🍀", "💎", "⭐"];
 
@@ -23,35 +24,70 @@ export function ChatScreen() {
   }, []);
 
   useEffect(() => {
-    if (!userArchetype) return;
-
-    const interval = setInterval(() => {
-      setDisplayText((prev) => 
-        prev === "현재 대화 중..." 
-          ? `${userArchetype} ${userName} 님` 
-          : "현재 대화 중..."
-      );
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [userArchetype, userName]);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [messages, isLoading]);
 
   const handleEndChat = () => {
     setIsFeedbackMode(true);
   };
 
-  const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() || isLoading) return;
 
-    const newMessage = {
+    const userMessage = {
       id: `m${messages.length + 1}`,
       speaker: "나" as const,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
       text: inputValue,
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputValue("");
+    setIsLoading(true);
+
+    try {
+      // 백엔드 개발자가 구현할 /api/chat 엔드포인트를 호출한다고 가정합니다.
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: updatedMessages.map(m => ({
+            role: m.speaker === "나" ? "user" : "assistant",
+            content: m.text
+          })),
+          // 설문 결과나 캐릭터 정보가 필요할 경우 함께 전달
+          userArchetype,
+          userName,
+          character: siteConfig.chat.character.name
+        }),
+      });
+
+      if (!response.ok) throw new Error("API 호출 실패");
+
+      const data = await response.json();
+      
+      const aiMessage = {
+        id: `m${updatedMessages.length + 1}`,
+        speaker: "상대방" as const, // siteConfig의 구조에 맞게 "나"가 아니면 상대방으로 처리
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+        text: data.reply || data.message || "미안해, 잠시 딴생각을 했어. 다시 말해줄래?",
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Chat Error:", error);
+      // 에러 시 사용자에게 알림 처리 등을 추가할 수 있습니다.
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -139,17 +175,15 @@ export function ChatScreen() {
                     <p className="text-xs font-black text-rose-400 uppercase tracking-widest mt-1">Dating Solution Active</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 rounded-full bg-rose-50 px-8 py-4 border-2 border-rose-100 shadow-sm min-w-[240px] justify-center overflow-hidden">
-                  <div className="h-3 w-3 rounded-full bg-rose-400 animate-pulse flex-shrink-0" />
-                  <div className="relative h-5 flex-1 flex justify-center items-center">
-                    <span 
-                      key={displayText}
-                      className="absolute text-rose-500 text-sm font-black uppercase whitespace-nowrap animate-text-slide-up"
-                    >
-                      {displayText}
+                
+                {userArchetype && (
+                  <div className="flex items-center gap-3 rounded-full bg-rose-50 px-6 py-3 border-2 border-rose-100 shadow-sm">
+                    <div className="h-2 w-2 rounded-full bg-rose-400 animate-pulse" />
+                    <span className="text-rose-600 text-sm font-black tracking-tight">
+                      {userArchetype}
                     </span>
                   </div>
-                </div>
+                )}
 
                 <style jsx global>{`
                   @keyframes text-slide-up {
@@ -169,7 +203,10 @@ export function ChatScreen() {
               </header>
 
               {/* 채팅 메시지 리스트 */}
-              <div className="flex-1 space-y-12 overflow-y-auto p-14 scrollbar-hide">
+              <div 
+                ref={scrollRef}
+                className="flex-1 space-y-12 overflow-y-auto p-14 scrollbar-hide"
+              >
                 <div className="text-center mb-14">
                   <span className="bg-rose-100/50 text-rose-400 text-xs font-black px-6 py-2.5 rounded-full uppercase tracking-[0.2em] border border-rose-100/50 shadow-sm">
                     선택한 캐릭터와 설문 결과를 바탕으로 대화합니다
@@ -190,7 +227,7 @@ export function ChatScreen() {
                         </div>
                         <div className={`relative px-8 py-5 rounded-[30px] shadow-sm transition-all border-2 ${
                           isMe 
-                            ? "bg-rose-500 text-white border-rose-400 rounded-tr-none" 
+                           ? "bg-rose-500 text-white border-rose-400 rounded-tr-none" 
                             : "bg-white text-rose-700 border-rose-100 rounded-tl-none"
                         }`}>
                           <p className="text-xl font-bold leading-relaxed break-keep">
@@ -203,6 +240,28 @@ export function ChatScreen() {
                     </div>
                   );
                 })}
+                
+                {isLoading && (
+                  <div className="flex items-start gap-5 flex-row">
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-[20px] bg-white border-2 border-rose-100 text-2xl shadow-sm animate-bounce">
+                      {siteConfig.chat.character.emoji}
+                    </div>
+                    <div className="relative flex flex-col gap-2 max-w-[75%] items-start">
+                      <div className="flex items-center gap-2 mb-1 px-2">
+                        <span className="text-sm font-black text-rose-400 uppercase tracking-tighter">
+                          {siteConfig.chat.character.name}
+                        </span>
+                      </div>
+                      <div className="relative px-8 py-5 rounded-[30px] shadow-sm bg-white text-rose-300 border-2 border-rose-100 rounded-tl-none">
+                        <div className="flex gap-1">
+                          <span className="animate-bounce">.</span>
+                          <span className="animate-bounce [animation-delay:0.2s]">.</span>
+                          <span className="animate-bounce [animation-delay:0.4s]">.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* 하단 입력 & 퀵 리플라이 */}
@@ -224,17 +283,19 @@ export function ChatScreen() {
                   <div className="flex items-center gap-4 rounded-full border-[3px] border-rose-100 bg-white p-2 pl-10 shadow-xl focus-within:border-rose-400 transition-all">
                     <input 
                       type="text" 
-                      placeholder="고민을 입력하세요..."
+                      placeholder={isLoading ? "상대방의 답변을 기다리는 중..." : "고민을 입력하세요..."}
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      className="flex-1 bg-transparent py-5 text-xl font-bold text-rose-600 placeholder:text-rose-200 focus:outline-none"
+                      disabled={isLoading}
+                      className="flex-1 bg-transparent py-5 text-xl font-bold text-rose-600 placeholder:text-rose-200 focus:outline-none disabled:opacity-50"
                     />
                     <button 
                       onClick={handleSendMessage}
-                      className="rounded-full bg-rose-500 px-10 py-5 text-lg font-black text-white shadow-lg hover:bg-rose-600 transition-all active:scale-95 border-2 border-rose-400"
+                      disabled={isLoading}
+                      className="rounded-full bg-rose-500 px-10 py-5 text-lg font-black text-white shadow-lg hover:bg-rose-600 transition-all active:scale-95 border-2 border-rose-400 disabled:bg-rose-300 disabled:border-rose-200"
                     >
-                      SEND ✨
+                      {isLoading ? "..." : "SEND ✨"}
                     </button>
                   </div>
                 </div>
