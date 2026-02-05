@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 
+/**
+ * 설문조사 화면 (SurveyScreen)
+ * 사용자의 연애 성향 및 남성성 지표를 테스트하는 화면입니다.
+ * 8개의 문항에 대한 답변을 수집하여 최종 성격 유형(앙큼계략남 등)을 판정합니다.
+ */
 export function SurveyScreen() {
   const router = useRouter();
   const totalQuestions = siteConfig.survey.questions.length;
@@ -13,6 +18,7 @@ export function SurveyScreen() {
   const [finalResult, setFinalResult] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  // 이미 설문 결과가 있다면 채팅방으로 바로 이동
   useEffect(() => {
     const savedResult = localStorage.getItem("surveyResult");
     if (savedResult) {
@@ -27,6 +33,10 @@ export function SurveyScreen() {
 
   const introEmojis = ["💖", "✨", "💗", "🌸", "💞", "🎀", "💘", "🌷", "🌹", "🎈", "🧸", "💌", "🍭", "🍀", "💎", "⭐"];
 
+  /**
+   * 답변 항목 선택 시 처리
+   * 마지막 문제가 아니면 0.4초 후 자동으로 다음 문항으로 이동합니다.
+   */
   const handleOptionSelect = (optionIndex: number) => {
     if (isTransitioning) return;
 
@@ -35,13 +45,12 @@ export function SurveyScreen() {
       [currentQuestion.id]: optionIndex,
     }));
 
-    // 마지막 문제가 아니면 선택 후 자동으로 다음 문제로 이동
     if (!isLast) {
       setIsTransitioning(true);
       setTimeout(() => {
         setCurrentIndex((prev) => prev + 1);
         setIsTransitioning(false);
-      }, 400); // 0.4초 딜레이로 선택된 피드백을 보여줌
+      }, 400);
     }
   };
 
@@ -49,6 +58,10 @@ export function SurveyScreen() {
     setCurrentIndex((prev) => Math.max(prev - 1, 0));
   };
 
+  /**
+   * 'DONE' 버튼 클릭 시 최종 결과 계산
+   * 점수에 따라 근육테토남, 앙큼계략남, 스윗에겐남, 예삐에삐남 등으로 분류합니다.
+   */
   const handleNext = () => {
     if (!canProceed) return;
 
@@ -57,61 +70,46 @@ export function SurveyScreen() {
       return;
     }
 
-    // 마지막 문제일 경우 결과 계산
-    // 점수 계산 로직: 0 / 2 / 4 / 6 배점
-      const optionScores = [
-        [0, 2, 4, 6], // Q1: 경험 횟수 (0이면 모솔남 확정)
-        [6, 4, 2, 0], // Q2: 데이트 준비
-        [6, 4, 2, 0], // Q3: 호감 표현
-        [6, 4, 2, 0], // Q4: 첫 만남 중요도
-        [6, 4, 2, 0], // Q5: 갈등 해결
-        [6, 4, 2, 0], // Q6: 설렘 순간
-        [6, 4, 2, 0], // Q7: 선물 스타일
-        [6, 4, 2, 0], // Q8: 진행 속도
-      ];
+    // 결과 판정 점수표 (0 / 2 / 4 / 6 배점)
+    const optionScores = [
+      [0, 2, 4, 6], // Q1: 경험 횟수 (0이면 모솔남 확정)
+      [6, 4, 2, 0], [6, 4, 2, 0], [6, 4, 2, 0], 
+      [6, 4, 2, 0], [6, 4, 2, 0], [6, 4, 2, 0], [6, 4, 2, 0]
+    ];
 
-      let result = "";
-      // Q1(연애 경험)이 0회(index 0)이면 무조건 모솔남
-      if (answers["q1"] === 0) {
-        result = "모솔남";
-      } else {
-        let totalScore = 0;
-        siteConfig.survey.questions.forEach((q, index) => {
-          const answerIndex = answers[q.id];
-          totalScore += optionScores[index][answerIndex];
-        });
+    let result = "";
+    // Q1(경험 0회) 예외 처리
+    if (answers["q1"] === 0) {
+      result = "모솔남";
+    } else {
+      let totalScore = 0;
+      siteConfig.survey.questions.forEach((q, index) => {
+        const answerIndex = answers[q.id];
+        totalScore += optionScores[index][answerIndex];
+      });
 
-        // 최종 판정 기준 (사용자 정의 분포)
-        if (totalScore >= 34) result = "근육테토남";
-        else if (totalScore >= 24) result = "앙큼계략남";
-        else if (totalScore >= 14) result = "스윗에겐남";
-        else result = "예삐에삐남";
-      }
+      if (totalScore >= 34) result = "근육테토남";
+      else if (totalScore >= 24) result = "앙큼계략남";
+      else if (totalScore >= 14) result = "스윗에겐남";
+      else result = "예삐에삐남";
+    }
 
-      localStorage.setItem("surveyResult", result);
-      setFinalResult(result);
-      setShowResultPopup(true);
+    localStorage.setItem("surveyResult", result);
+    setFinalResult(result);
+    setShowResultPopup(true);
   };
 
   return (
     <section className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-rose-50 select-none">
-      {/* 배경 이모티콘 파티 */}
       <div className="absolute inset-0 -z-10 flex flex-wrap items-center justify-center gap-8 p-10 opacity-30 pointer-events-none">
         {Array.from({ length: 180 }).map((_, i) => (
-          <span 
-            key={i} 
-            className="text-3xl sm:text-4xl" 
-            style={{ 
-              transform: `rotate(${(i * 30) % 360}deg)` 
-            }}
-          >
+          <span key={i} className="text-3xl sm:text-4xl" style={{ transform: `rotate(${(i * 30) % 360}deg)` }}>
             {introEmojis[i % introEmojis.length]}
           </span>
         ))}
       </div>
 
-      {/* 중앙 대형 핑크 액자 */}
-      <div className="relative z-10 flex h-[92vh] w-[96%] flex-col items-center justify-center rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-4 py-8 sm:px-6 sm:py-10 sm:w-[90%] lg:w-[85%]">
+      <div className="relative z-10 flex h-[92dvh] w-[96%] flex-col items-center justify-center rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-4 py-8 sm:px-6 sm:py-10 sm:w-[90%] lg:w-[85%]">
         <div className="w-full max-w-5xl text-center h-full flex flex-col justify-center">
           <div className="mb-4 sm:mb-8 flex items-center justify-center gap-3 sm:gap-4 text-lg sm:text-2xl font-bold text-rose-300">
             <span>Question</span>
@@ -123,7 +121,6 @@ export function SurveyScreen() {
           </div>
 
           <div className="w-full flex items-center justify-between gap-4 sm:gap-10">
-            {/* 왼쪽 화살표 버튼 < */}
             <button
               onClick={handlePrev}
               disabled={currentIndex === 0}
@@ -132,7 +129,6 @@ export function SurveyScreen() {
               ‹
             </button>
 
-            {/* 중앙 설문 내용 */}
             <div key={currentIndex} className="flex-1 animate-survey-slide-in px-2 sm:px-10 overflow-y-auto max-h-[70vh] scrollbar-hide">
               <h3 className="mb-6 sm:mb-12 text-2xl font-black tracking-tight text-rose-500 sm:text-5xl lg:text-6xl leading-[1.2] break-keep word-break-keep-all mx-auto max-w-4xl">
                 {currentQuestion.text}
@@ -161,7 +157,6 @@ export function SurveyScreen() {
               </div>
             </div>
 
-            {/* 오른쪽 공간 (마지막 문제에서만 DONE 표시) */}
             <div className="w-16 sm:w-24 flex-shrink-0 flex items-center justify-center">
               {isLast && canProceed && (
                 <button
@@ -176,46 +171,19 @@ export function SurveyScreen() {
         </div>
       </div>
 
-      {/* 결과 팝업 */}
       {showResultPopup && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="relative w-[90%] max-w-xl scale-in-center rounded-[50px] bg-white p-12 text-center shadow-[0_0_100px_rgba(255,182,193,0.5)] overflow-hidden">
-            {/* 데코레이션 요소 */}
-            <div className="absolute -top-6 -left-6 text-6xl opacity-20 animate-float-heart">🎀</div>
-            <div className="absolute -bottom-6 -right-6 text-6xl opacity-20 animate-float-heart" style={{ animationDelay: '1s' }}>💖</div>
-            <div className="absolute top-1/4 -right-4 text-3xl opacity-10 animate-pulse">✨</div>
-            <div className="absolute bottom-1/4 -left-4 text-3xl opacity-10 animate-pulse" style={{ animationDelay: '0.5s' }}>✨</div>
-
             <div className="relative z-10">
-              <div className="mb-6 flex items-center justify-center gap-3">
-                <span className="text-2xl opacity-40">🎀</span>
-                <div className="text-2xl font-black text-rose-400 uppercase tracking-widest">Test Result</div>
-                <span className="text-2xl opacity-40">🎀</span>
-              </div>
-              
               <div className="mb-8">
                 <span className="text-4xl font-bold text-rose-300">당신은...</span>
                 <div className="relative inline-block mt-4">
-                  <h2 className="text-7xl font-black text-rose-600 tracking-tighter">
-                    {finalResult}
-                  </h2>
+                  <h2 className="text-7xl font-black text-rose-600 tracking-tighter">{finalResult}</h2>
                   <span className="absolute -top-4 -right-8 text-4xl animate-bounce">💖</span>
                 </div>
               </div>
-
-              <p className="mb-12 text-xl font-bold text-rose-400/80 leading-relaxed">
-                분석이 완료되었습니다.<br />
-                당신의 성향에 맞는 대화가 준비되었습니다.
-              </p>
-              
-              <button
-                onClick={() => router.push("/chat")}
-                className="group relative w-full overflow-hidden rounded-full bg-rose-500 py-8 text-3xl font-black text-white shadow-[0_20px_40px_rgba(244,114,182,0.3)] transition-all hover:scale-105 active:scale-95"
-              >
-                <span className="relative z-10 flex items-center justify-center gap-2">
-                  확인 <span className="text-2xl group-hover:animate-ping">✨</span>
-                </span>
-              </button>
+              <p className="mb-12 text-xl font-bold text-rose-400/80 leading-relaxed">분석이 완료되었습니다.<br />당신의 성향에 맞는 대화가 준비되었습니다.</p>
+              <button onClick={() => router.push("/chat")} className="group relative w-full overflow-hidden rounded-full bg-rose-500 py-8 text-3xl font-black text-white shadow-[0_20px_40px_rgba(244,114,182,0.3)] transition-all hover:scale-105 active:scale-95">확인 ✨</button>
             </div>
           </div>
         </div>

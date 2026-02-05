@@ -1,6 +1,11 @@
 import { ActionButton } from "@/components/ActionButton";
 import { siteConfig } from "@/config/site";
 
+/**
+ * 인트로 화면 (IntroScreen)
+ * 앱의 첫 인상을 결정하는 화면으로, 감성적인 애니메이션과
+ * '사랑에 빠진 게 죄는 아니잖아'라는 강렬한 메시지를 단계적으로 노출합니다.
+ */
 export function IntroScreen() {
   const introEmojis = ["💖", "✨", "💗", "🌸", "💞", "🎀", "💘", "🌷", "🌹", "🎈", "🧸", "💌", "🍭", "🍀", "💎", "⭐"];
 
@@ -24,7 +29,7 @@ export function IntroScreen() {
       </div>
 
       {/* 중앙 하얀색 대형 액자 - 배경 위에 띄움 */}
-      <div className="relative z-10 flex h-[85vh] sm:h-[82vh] w-[94%] sm:w-[92%] items-center justify-center overflow-hidden rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-4 sm:px-6 py-10 sm:w-[88%] lg:w-[82%]">
+      <div className="relative z-10 flex h-[85dvh] sm:h-[82dvh] w-[94%] sm:w-[92%] items-center justify-center overflow-hidden rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-4 sm:px-6 py-10 sm:w-[88%] lg:w-[82%]">
         <div className="relative flex min-h-[400px] sm:min-h-[450px] w-full items-center justify-center text-center">
           {/* Phase One: 중앙 정렬, 액자 안을 벗어나지 않도록 크기 조절 */}
           <div className="intro-phase intro-phase-one absolute flex w-full flex-col items-center justify-center gap-6 sm:gap-10 px-4">

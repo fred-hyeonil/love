@@ -26,14 +26,14 @@ export function LoginScreen() {
     setValues((prev) => ({ ...prev, [id]: next }));
   };
 
+  /**
+   * 로그인 요청 처리
+   */
   const onLogin = async () => {
     setError(null);
 
-    const userId = (values.userId ?? values.id ?? "").trim();     // ✅ id도 허용
-    const password = (values.password ?? "").trim();;
-
-    console.log("login values:", values);
-    console.log("login payload:", { userId, password });
+    const userId = (values.userId ?? values.id ?? "").trim();
+    const password = (values.password ?? "").trim();
 
     if (!userId || !password) {
       setError("아이디와 비밀번호를 입력해주세요.");
@@ -43,36 +43,46 @@ export function LoginScreen() {
     try {
       setSubmitting(true);
 
+      // 백엔드 로그인 API 호출
       const data = await apiFetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, password }),
       });
 
-      // JWT 및 사용자 정보 저장
-      localStorage.setItem("accessToken", data.accessToken);
+      // 1. JWT 토큰 저장 (accessToken 또는 token 키값 유연하게 처리)
+      if (data.accessToken) {
+        localStorage.setItem("accessToken", data.accessToken);
+      } else if (data.token) {
+        localStorage.setItem("accessToken", data.token);
+      } else {
+        throw new Error("로그인 응답에 토큰이 없습니다.");
+      }
+
+      // 2. 사용자 이름 저장
       if (data.user?.name) {
         localStorage.setItem("userName", data.user.name);
       } else if (data.name) {
         localStorage.setItem("userName", data.name);
       }
 
+      // 3. 설문 결과 유무에 따른 페이지 이동
       const savedResult = localStorage.getItem("surveyResult");
       if (savedResult) {
-        router.push("/chat");
+        router.push("/chat"); // 이미 설문을 했다면 채팅방으로
       } else {
-        router.push("/ideal"); // 로그인 성공 후 이동
+        router.push("/ideal"); // 설문 전이라면 이상형 선택/설문으로
       }
     } catch (e: any) {  
-  if (e?.name === "ApiError" && e.status === 401) {
-    setError("아이디/비밀번호를 다시 확인해주세요.");
-    return;
-  }
-  setError(e?.message ?? "로그인에 실패했습니다.");
-} finally {
-  setSubmitting(false);
-}
-
+      // 401 에러(아이디/비번 불일치) 처리
+      if (e?.name === "ApiError" && e.status === 401) {
+        setError("아이디/비밀번호를 다시 확인해주세요.");
+        return;
+      }
+      setError(e?.message ?? "로그인에 실패했습니다.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const primaryAction = siteConfig.login.actions.find(
@@ -94,7 +104,7 @@ export function LoginScreen() {
       </div>
 
       {/* 중앙 카드 */}
-      <div className="relative z-10 flex h-[90vh] sm:h-[85vh] w-[94%] flex-col items-center justify-center rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-6 py-10 sm:px-10 sm:py-12 sm:w-[85%] lg:w-[70%] xl:w-[60%]">
+      <div className="relative z-10 flex h-[90dvh] sm:h-[85dvh] w-[94%] flex-col items-center justify-center rounded-[40px] sm:rounded-[60px] bg-white shadow-[0_0_150px_rgba(255,182,193,0.6)] px-6 py-10 sm:px-10 sm:py-12 sm:w-[85%] lg:w-[70%] xl:w-[60%]">
         <div className="w-full max-w-2xl text-center overflow-y-auto scrollbar-hide">
           <h2 className="mb-6 sm:mb-12 text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-rose-500">
             {siteConfig.login.title}
@@ -108,7 +118,7 @@ export function LoginScreen() {
                 placeholder={field.placeholder}
                 value={values[field.id] ?? ""}
                 onChange={(e) => onChange(field.id, e.target.value)}
-                className="w-full rounded-[20px] sm:rounded-[30px] border-[3px] sm:border-4 border-rose-100 bg-rose-50/30 px-6 py-4 sm:px-10 sm:py-6 text-lg sm:text-2xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none focus:ring-4 sm:ring-8 focus:ring-rose-100/50"
+                className="w-full rounded-[20px] sm:rounded-[30px] border-[3px] sm:border-4 border-rose-100 bg-rose-50/30 px-6 py-4 sm:px-10 sm:py-6 text-lg sm:text-2xl font-bold text-rose-600 placeholder:text-rose-300 transition-all focus:border-rose-400 focus:bg-white focus:outline-none"
               />
             ))}
           </div>
