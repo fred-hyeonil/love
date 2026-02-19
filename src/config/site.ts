@@ -22,7 +22,7 @@ export const siteConfig = {
     title: "다시 만나서 반가워요",
     subtitle: "짧은 로그인으로 감정 기록을 이어가요.",
     fields: [
-      { id: "id", label: "ID", type: "text", placeholder: "아이디 입력" },
+      { id: "userId", label: "ID", type: "text", placeholder: "아이디 입력" },
       { id: "password", label: "PW", type: "password", placeholder: "비밀번호 입력" },
     ],
     actions: [

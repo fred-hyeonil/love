@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
+import { getSession, postPartnerType } from "@/lib/api";
 
 /**
  * 이상형 선택 화면 (IdealScreen)
@@ -33,14 +34,20 @@ export function IdealScreen() {
             {siteConfig.ideal.choices.map((choice) => (
               <button
                 key={choice.id}
-                onClick={() => {
-                  // 선택한 캐릭터의 이름과 이모지를 저장하여 채팅방에서 활용
+                onClick={async () => {
+                  // 선택한 캐릭터의 이름·이모지·personaKey 저장 (채팅 대화 생성 시 Python에 전달용)
                   localStorage.setItem("selectedIdeal", JSON.stringify({
                     name: choice.label,
-                    emoji: choice.emoji
+                    emoji: choice.emoji,
+                    personaKey: choice.id,
                   }));
-                  
-                  // 무조건 채팅방으로 복귀 (독립적 처리)
+                  // 백엔드에 partner_type 저장 후 세션 재호출로 상태 업데이트
+                  try {
+                    await postPartnerType(choice.id);
+                    await getSession();
+                  } catch {
+                    // 저장 실패해도 로컬 선택은 유지, 채팅으로 이동
+                  }
                   router.push("/chat");
                 }}
                 className="group relative flex flex-col items-center justify-center rounded-[30px] sm:rounded-[40px] border-[3px] sm:border-4 border-rose-100 bg-rose-50/30 px-4 py-6 sm:py-8 transition-all hover:scale-[1.05] hover:border-rose-400 hover:bg-white hover:shadow-[0_20px_40px_rgba(244,114,182,0.2)] active:scale-95"

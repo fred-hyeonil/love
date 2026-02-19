@@ -2,7 +2,7 @@
 
 import { ActionButton } from "@/components/ActionButton";
 import { siteConfig } from "@/config/site";
-import { apiFetch } from "@/lib/api";
+import { getSession, getStoredSession, login } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
@@ -27,7 +27,8 @@ export function LoginScreen() {
   };
 
   /**
-   * 로그인 요청 처리
+   * 로그인: POST /api/auth/login
+   * body: { userId, password } (백엔드와 동일). 응답에 세션 포함 시 저장 후 라우팅.
    */
   const onLogin = async () => {
     setError(null);
@@ -43,43 +44,37 @@ export function LoginScreen() {
     try {
       setSubmitting(true);
 
-      // 백엔드 로그인 API 호출
-      const data = await apiFetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, password }),
-      });
+      const data = await login({ userId, password });
+      localStorage.setItem("accessToken", data.accessToken);
 
-      // 1. JWT 토큰 저장 (accessToken 또는 token 키값 유연하게 처리)
-      if (data.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);
-      } else if (data.token) {
-        localStorage.setItem("accessToken", data.token);
+      if (data.user && data.partnerType !== undefined) {
+        localStorage.setItem(
+          "appSession",
+          JSON.stringify({
+            user: data.user,
+            partnerType: data.partnerType,
+            lastConversation: data.lastConversation ?? null,
+            lastConversationMessages: data.lastConversationMessages ?? [],
+          })
+        );
       } else {
-        throw new Error("로그인 응답에 토큰이 없습니다.");
+        await getSession();
       }
 
-      // 2. 사용자 이름 저장
-      if (data.user?.name) {
-        localStorage.setItem("userName", data.user.name);
-      } else if (data.name) {
-        localStorage.setItem("userName", data.name);
-      }
-
-      // 3. 설문 결과 유무에 따른 페이지 이동
-      const savedResult = localStorage.getItem("surveyResult");
-      if (savedResult) {
-        router.push("/chat"); // 이미 설문을 했다면 채팅방으로
+      const session = getStoredSession();
+      const isSet = data.partnerType?.isSet ?? session?.partnerType?.isSet ?? false;
+      if (!isSet) {
+        router.push("/survey");
       } else {
-        router.push("/ideal"); // 설문 전이라면 이상형 선택/설문으로
+        router.push("/chat");
       }
-    } catch (e: any) {  
-      // 401 에러(아이디/비번 불일치) 처리
-      if (e?.name === "ApiError" && e.status === 401) {
+    } catch (e: unknown) {
+      const err = e as { name?: string; status?: number; message?: string };
+      if (err?.name === "ApiError" && err?.status === 401) {
         setError("아이디/비밀번호를 다시 확인해주세요.");
         return;
       }
-      setError(e?.message ?? "로그인에 실패했습니다.");
+      setError(err?.message ?? "로그인에 실패했습니다.");
     } finally {
       setSubmitting(false);
     }

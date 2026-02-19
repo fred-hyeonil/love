@@ -1,8 +1,91 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { siteConfig } from "@/config/site";
+import { ApiError, getSession, getStoredSession, postPartnerType } from "@/lib/api";
+
+function ConfirmResultButton({
+  value,
+  onSuccess,
+}: {
+  value: string;
+  onSuccess: () => void;
+}) {
+  const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleConfirm = async () => {
+    setError(null);
+    setSubmitting(true);
+    try {
+      await postPartnerType(value);
+      try {
+        await getSession();
+      } catch {
+        // 저장은 성공했는데 세션 갱신만 실패한 경우에도 채팅으로 이동
+      }
+      onSuccess();
+    } catch (e) {
+      if (e instanceof ApiError) {
+        // 디버깅: 서버가 어떤 상태코드/메시지로 거부했는지 확인
+        console.warn("[Survey] partner-type 저장 실패:", e.status, e.statusText, e.body);
+        if (e.status === 401) {
+          setError("로그인이 만료되었을 수 있어요. 다시 로그인하거나 채팅으로 이동해 주세요.");
+          return;
+        }
+        if (e.status === 409) {
+          setError("이미 유형이 설정되어 있습니다.");
+          await getSession().catch(() => {});
+          onSuccess();
+          return;
+        }
+      }
+      setError("저장에 실패했습니다. 다시 시도해 주세요.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <>
+      {error && (
+        <div className="mb-4 space-y-3">
+          <p className="text-red-500 font-bold">{error}</p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <button
+              type="button"
+              onClick={() => router.push("/chat")}
+              className="px-5 py-2.5 rounded-full bg-rose-100 text-rose-700 font-bold hover:bg-rose-200"
+            >
+              채팅으로 이동
+            </button>
+            {error.includes("로그인") && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== "undefined") localStorage.removeItem("accessToken");
+                  router.push("/login");
+                }}
+                className="px-5 py-2.5 rounded-full bg-rose-200 text-rose-800 font-bold hover:bg-rose-300"
+              >
+                다시 로그인
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+      <button
+        onClick={handleConfirm}
+        disabled={submitting}
+        className="group relative w-full overflow-hidden rounded-full bg-rose-500 py-8 text-3xl font-black text-white shadow-[0_20px_40px_rgba(244,114,182,0.3)] transition-all hover:scale-105 active:scale-95 disabled:opacity-60"
+      >
+        {submitting ? "저장 중..." : "확인 ✨"}
+      </button>
+    </>
+  );
+}
 
 /**
  * 설문조사 화면 (SurveyScreen)
@@ -11,6 +94,7 @@ import { siteConfig } from "@/config/site";
  */
 export function SurveyScreen() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const totalQuestions = siteConfig.survey.questions.length;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
@@ -18,13 +102,21 @@ export function SurveyScreen() {
   const [finalResult, setFinalResult] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // 이미 설문 결과가 있다면 채팅방으로 바로 이동
+  const isRetake = searchParams.get("retake") === "1" || searchParams.has("retake");
+
+  // 인증 체크. 이미 테스트 완료(partnerType.isSet)면 채팅으로 → 단, "성격 테스트 다시 하기"로 들어온 경우(retake)는 스킵
   useEffect(() => {
-    const savedResult = localStorage.getItem("surveyResult");
-    if (savedResult) {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      router.replace("/login");
+      return;
+    }
+    if (isRetake) return;
+    const session = getStoredSession();
+    if (session?.partnerType?.isSet) {
       router.replace("/chat");
     }
-  }, [router]);
+  }, [router, isRetake]);
 
   const currentQuestion = siteConfig.survey.questions[currentIndex];
   const selectedOption = answers[currentQuestion.id];
@@ -94,7 +186,6 @@ export function SurveyScreen() {
       else result = "예삐에삐남";
     }
 
-    localStorage.setItem("surveyResult", result);
     setFinalResult(result);
     setShowResultPopup(true);
   };
@@ -183,7 +274,10 @@ export function SurveyScreen() {
                 </div>
               </div>
               <p className="mb-12 text-xl font-bold text-rose-400/80 leading-relaxed">분석이 완료되었습니다.<br />당신의 성향에 맞는 대화가 준비되었습니다.</p>
-              <button onClick={() => router.push("/chat")} className="group relative w-full overflow-hidden rounded-full bg-rose-500 py-8 text-3xl font-black text-white shadow-[0_20px_40px_rgba(244,114,182,0.3)] transition-all hover:scale-105 active:scale-95">확인 ✨</button>
+              <ConfirmResultButton
+                value={finalResult}
+                onSuccess={() => router.push("/chat")}
+              />
             </div>
           </div>
         </div>
